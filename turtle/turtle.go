@@ -85,6 +85,10 @@ func (t *Turtle) Draw(cv *canvas.Canvas, w, h float64) {
 	cv.FillRect(0, 0, w, h)
 
 	lstate := t.state
+	// set turtle position based on screen size
+	lstate.Position.X = lstate.Position.X * w
+	lstate.Position.Y = lstate.Position.Y * h
+	log.Println(lstate.Position.X, lstate.Position.Y)
 
 	for _, i := range t.system.State() {
 		cv.BeginPath()

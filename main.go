@@ -75,20 +75,20 @@ func brush() (string, float64, l.Rules) {
 }
 func main() {
 	runtime.LockOSThread()
-	width, height := 1300, 1000
+	width, height := 1024, 768
 
 	// axiom, rules := dragonCurve()
 	axiom, angle, rules := brush()
 	system := l.NewSystem(axiom, rules)
 
 	order := 4
-	// xstart, ystart := float64(width)/2.0, float64(height)/2.0
-	xstart, ystart := float64(width)/2.0, float64(height)
+	// turtle lives in 0,0 -> 1,1 space; top left is 0,0
+	xstart, ystart := 0.5, 1.0
 	// xstart, ystart := float64(width), float64(height)
 	initialState := turtle.State{
 		Position:  turtle.NewPoint(xstart, ystart),
 		Direction: 180, // up
-		StepSize:  0.1,
+		StepSize:  0.2,
 		BrushSize: 1,
 		Angle:     angle,
 	}

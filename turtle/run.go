@@ -9,6 +9,7 @@ import (
 	"github.com/tfriedel6/canvas/backend/goglbackend"
 )
 
+// for cursor position
 var mx, my float64
 
 // Run runs the simulation with the given turtle
@@ -24,6 +25,11 @@ func Run(t *Turtle, width, height int) {
 	// the stencil size setting is required for the canvas to work
 	glfw.WindowHint(glfw.StencilBits, 8)
 	glfw.WindowHint(glfw.DepthBits, 0)
+	glfw.WindowHint(glfw.Resizable, glfw.True)
+	// glfw.WindowHint(glfw.ContextVersionMajor, 4)
+	// glfw.WindowHint(glfw.ContextVersionMinor, 1)
+	// glfw.WindowHint(glfw.OpenGLProfile, glfw.OpenGLCoreProfile)
+	// glfw.WindowHint(glfw.OpenGLForwardCompatible, glfw.True)
 
 	// create window
 	window, err := glfw.CreateWindow(width, height, "Turtles away!", nil, nil)
@@ -47,6 +53,7 @@ func Run(t *Turtle, width, height int) {
 	if err != nil {
 		log.Fatalf("Error loading canvas GL assets: %v", err)
 	}
+	// backend := softwarebackend.New(width, height)
 
 	window.SetCursorPosCallback(func(w *glfw.Window, xpos float64, ypos float64) {
 		mx, my = xpos, ypos
@@ -60,11 +67,13 @@ func Run(t *Turtle, width, height int) {
 		glfw.PollEvents()
 
 		// set canvas size
-		ww, wh := window.GetSize()
+		// ww, wh := window.GetSize()
+		ww, wh := window.GetFramebufferSize()
 		backend.SetBounds(0, 0, ww, wh)
 
 		// call the run function to do all the drawing
 		t.Draw(cv, float64(ww), float64(wh))
+		// t.Draw(cv, float64(width), float64(height))
 
 		// swap back and front buffer
 		window.SwapBuffers()
