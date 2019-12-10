@@ -2,6 +2,7 @@ package main
 
 import (
 	"runtime"
+	"time"
 
 	"github.com/DanTulovsky/L-System/l"
 	"github.com/DanTulovsky/Turtle/turtle"
@@ -77,26 +78,26 @@ func main() {
 	runtime.LockOSThread()
 	width, height := 1024, 768
 
-	// axiom, rules := dragonCurve()
-	axiom, angle, rules := brush()
+	// axiom, angle, rules := dragonCurve()
+	axiom, angle, rules := ytree()
 	system := l.NewSystem(axiom, rules)
 
-	order := 4
+	order := 12
 	// turtle lives in 0,0 -> 1,1 space; top left is 0,0
-	xstart, ystart := 0.5, 1.0
-	// xstart, ystart := float64(width), float64(height)
+	xstart, ystart := 0.5, 0.8
 	initialState := turtle.State{
 		Position:  turtle.NewPoint(xstart, ystart),
 		Direction: 180, // up
-		StepSize:  0.2,
-		BrushSize: 1,
+		StepSize:  4,
+		BrushSize: 8,
 		Angle:     angle,
 	}
 	rotate := 0.0
 	t := turtle.NewTurtle(system, initialState, rotate)
 
 	// Execute the steps
-	t.Step(order)
+	delay := 600 * time.Millisecond
+	go t.Step(order, delay)
 
 	// Display results
 	turtle.Run(t, width, height)

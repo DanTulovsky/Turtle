@@ -3,6 +3,7 @@ package turtle
 import (
 	"log"
 	"math"
+	"time"
 
 	"github.com/golang-collections/collections/stack"
 
@@ -54,10 +55,11 @@ func NewTurtle(lsystem *l.System, state State, rotate float64) *Turtle {
 }
 
 // Step makes the turtle take n steps
-func (t *Turtle) Step(n int) {
+func (t *Turtle) Step(n int, delay time.Duration) {
 	log.Println("Calculating system...")
 	for i := 0; i < n; i++ {
 		t.system.Step()
+		time.Sleep(delay)
 	}
 	log.Println("Finished calculating system...")
 }
@@ -88,7 +90,6 @@ func (t *Turtle) Draw(cv *canvas.Canvas, w, h float64) {
 	// set turtle position based on screen size
 	lstate.Position.X = lstate.Position.X * w
 	lstate.Position.Y = lstate.Position.Y * h
-	log.Println(lstate.Position.X, lstate.Position.Y)
 
 	for _, i := range t.system.State() {
 		cv.BeginPath()
