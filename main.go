@@ -151,7 +151,6 @@ func main() {
 	delay := 5 * time.Millisecond
 	// TODO: Put in own thread and add locking as needed
 	go func() {
-		time.Sleep(1 * time.Second)
 		t.Step(order, delay)
 	}()
 
