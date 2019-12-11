@@ -13,9 +13,9 @@ import (
 func dragonCurve() (string, float64, l.Rules) {
 	axiom := "FX"
 	rules := l.NewRules()
-	rules.Add('X', "-FX++FY-")
-	rules.Add('Y', "+FX--FY+")
-	rules.Add('F', "")
+	rules.Add("X", "-FX++FY-")
+	rules.Add("Y", "+FX--FY+")
+	rules.Add("F", "")
 
 	return axiom, 8, rules
 }
@@ -23,8 +23,8 @@ func dragonCurve() (string, float64, l.Rules) {
 func tree1() (string, float64, l.Rules) {
 	axiom := "+++FX"
 	rules := l.NewRules()
-	rules.Add('X', "@[>4-FY]+FX")
-	rules.Add('Y', "FX+FY-FX")
+	rules.Add("X", "@[>4-FY]+FX")
+	rules.Add("Y", "FX+FY-FX")
 
 	return axiom, 12, rules
 }
@@ -32,15 +32,15 @@ func tree1() (string, float64, l.Rules) {
 func tree3() (string, float64, l.Rules) {
 	axiom := "X"
 	rules := l.NewRules()
-	rules.Add('X', "F-[[>6X]+X]+F[>6+FX]->X")
-	rules.Add('F', "FF")
+	rules.Add("X", "F-[[>6X]+X]+F[>6+FX]->X")
+	rules.Add("F", "FF")
 
 	return axiom, 16, rules
 }
 func ytree() (string, float64, l.Rules) {
 	axiom := "FX"
 	rules := l.NewRules()
-	rules.Add('X', "@[-FX]+FX")
+	rules.Add("X", "@[-FX]+FX")
 
 	return axiom, 8, rules
 }
@@ -49,12 +49,12 @@ func sierpinkskiTriangle() (string, float64, l.Rules) {
 	axiom := "F"
 
 	rules := l.NewRules()
-	rules.Add('F', "FXF")
-	rules.Add('X', "+FXRF-FLXR<F-F>LXR<F+")
-	// rules.Add('L', ">6")
-	// rules.Add('R', "<6")
-	rules.Add('L', "")
-	rules.Add('R', "")
+	rules.Add("F", "FXF")
+	rules.Add("X", "+FXRF-FLXR<F-F>LXR<F+")
+	// rules.Add("L", ">6")
+	// rules.Add("R", "<6")
+	rules.Add("L", "")
+	rules.Add("R", "")
 
 	return axiom, 3, rules
 }
@@ -63,8 +63,8 @@ func sierpinkskiCarpet() (string, float64, l.Rules) {
 	axiom := "F"
 
 	rules := l.NewRules()
-	rules.Add('F', "<F+F-F-F-G+F+F+F-F")
-	rules.Add('G', "GGG")
+	rules.Add("F", "<F+F-F-F-G+F+F+F-F")
+	rules.Add("G", "GGG")
 
 	return axiom, 4, rules
 }
@@ -73,7 +73,7 @@ func kochCurve() (string, float64, l.Rules) {
 	axiom := "F"
 
 	rules := l.NewRules()
-	rules.Add('F', "<F+F--F+F")
+	rules.Add("F", "<F+F--F+F")
 
 	return axiom, 6, rules
 }
@@ -81,7 +81,7 @@ func bush() (string, float64, l.Rules) {
 	axiom := "F"
 
 	rules := l.NewRules()
-	rules.Add('F', "FF-[>5-F+F+F]+[>5+F-F-F]")
+	rules.Add("F", "FF-[>5-F+F+F]+[>5+F-F-F]")
 
 	return axiom, 16, rules
 }
@@ -89,8 +89,8 @@ func circular() (string, float64, l.Rules) {
 	axiom := "X+X+X+X+X+X+X+X+X+X+X+X+X+X+X+X+X+X+X+X+X+X+X+X"
 
 	rules := l.NewRules()
-	rules.Add('X', "<[<F+F+F+F[<---X-Y]+++++F++++++++F-F-F-F]")
-	rules.Add('Y', "[F+F+F+F[---Y]+++++F++++++++F-F-F-F]")
+	rules.Add("X", "<[<F+F+F+F[<---X-Y]+++++F++++++++F-F-F-F]")
+	rules.Add("Y", "[F+F+F+F[---Y]+++++F++++++++F-F-F-F]")
 
 	return axiom, 24, rules
 }
@@ -98,8 +98,8 @@ func fasscurve2() (string, float64, l.Rules) {
 	axiom := "-L"
 
 	rules := l.NewRules()
-	rules.Add('L', "<LFLF+RFR+FLFL-FRF-LFL-FR+F+RF-LFL-FRFRFR+")
-	rules.Add('R', "<-LFLFLF+RFR+FL-F-LF+RFR+FLF+RFRF-LFL-FRFR")
+	rules.Add("L", "<LFLF+RFR+FLFL-FRF-LFL-FR+F+RF-LFL-FRFRFR+")
+	rules.Add("R", "<-LFLFLF+RFR+FL-F-LF+RFR+FLF+RFRF-LFL-FRFR")
 
 	return axiom, 4, rules
 }
@@ -107,28 +107,28 @@ func lawninspring() (string, float64, l.Rules) {
 	axiom := "%40X"
 
 	rules := l.NewRules()
-	rules.Add('X', "[+++++F-F-FZ]GX++++GY")
-	rules.Add('Y', "[+++++F-F-FZ]GX----GY")
-	rules.Add('Z', "W")
-	rules.Add('W', "U")
-	rules.Add('U', "[@.3[+++F]G++[+++F]G++[+++F]G++[+++F]G++[+++F]G++[+++F]G++[+++F]G++[+++F]G]Z")
-	rules.Add('F', "")
-	rules.Add('G', "")
+	rules.Add("X", "[+++++F-F-FZ]GX++++GY")
+	rules.Add("Y", "[+++++F-F-FZ]GX----GY")
+	rules.Add("Z", "W")
+	rules.Add("W", "U")
+	rules.Add("U", "[@.3[+++F]G++[+++F]G++[+++F]G++[+++F]G++[+++F]G++[+++F]G++[+++F]G++[+++F]G]Z")
+	rules.Add("F", "")
+	rules.Add("G", "")
 
 	return axiom, 16, rules
 }
 func fractalplant() (string, float64, l.Rules) {
 	axiom := "X"
 	rules := l.NewRules()
-	rules.Add('X', "F+[[X]-X]-F[-FX]+X")
-	rules.Add('F', "FF")
+	rules.Add("X", "F+[[X]-X]-F[-FX]+X")
+	rules.Add("F", "FF")
 
 	return axiom, 14.4, rules
 }
 func simple() (string, float64, l.Rules) {
 	axiom := "Y"
 	rules := l.NewRules()
-	rules.Add('Y', "XYX")
+	rules.Add("Y", "XYX")
 
 	return axiom, 8, rules
 }

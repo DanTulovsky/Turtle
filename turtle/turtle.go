@@ -92,14 +92,13 @@ func (t *Turtle) Draw(cv *canvas.Canvas, w, h float64) {
 	lstate.Position.X = lstate.Position.X * w
 	lstate.Position.Y = lstate.Position.Y * h
 
-	// for _, i := range t.system.State2() {
 	for e := t.System().State().Front(); e != nil; e = e.Next() {
-		i := e.Value.(rune)
+		i := e.Value.(string)
 
 		cv.BeginPath()
 		cv.MoveTo(lstate.Position.X, lstate.Position.Y)
 		switch i {
-		case 'F':
+		case "F":
 			dirR := lstate.Direction * (math.Pi / 180)
 			x := lstate.Position.X + lstate.StepSize*unitPixel*math.Sin(dirR)
 			y := lstate.Position.Y + lstate.StepSize*unitPixel*math.Cos(dirR)
@@ -107,7 +106,7 @@ func (t *Turtle) Draw(cv *canvas.Canvas, w, h float64) {
 			cv.LineTo(x, y)
 			lstate.Position.X = x
 			lstate.Position.Y = y
-		case 'G':
+		case "G":
 			dirR := lstate.Direction * (math.Pi / 180)
 			x := lstate.Position.X + lstate.StepSize*unitPixel*math.Sin(dirR)
 			y := lstate.Position.Y + lstate.StepSize*unitPixel*math.Cos(dirR)
@@ -116,17 +115,17 @@ func (t *Turtle) Draw(cv *canvas.Canvas, w, h float64) {
 			lstate.Position.X = x
 			lstate.Position.Y = y
 
-		case '-':
+		case "-":
 			lstate.Direction = lstate.Direction - 360/lstate.Angle
-		case '+':
+		case "+":
 			lstate.Direction = lstate.Direction + 360/lstate.Angle
-		case '@':
+		case "@":
 			lstate.StepSize = lstate.StepSize * 0.6
 			lstate.BrushSize = lstate.BrushSize * 0.6
-		case '[':
+		case "[":
 			// push state
 			t.stateStack.Push(lstate)
-		case ']':
+		case "]":
 			// pop state
 			lstate = (t.stateStack.Pop()).(State)
 			cv.MoveTo(lstate.Position.X, lstate.Position.Y)
