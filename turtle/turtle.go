@@ -57,15 +57,9 @@ func NewTurtle(lsystem *l.System, state State, rotate float64) *Turtle {
 // Step makes the turtle take n steps
 func (t *Turtle) Step(n int, delay time.Duration) {
 	log.Println("Calculating system...")
-	realdelay := delay
 
 	for i := 0; i < n; i++ {
-		if i == n-1 {
-			realdelay = delay
-		} else {
-			realdelay = 0
-		}
-		t.system.Step(realdelay)
+		t.system.Step(delay)
 
 	}
 	log.Println("Finished calculating system...")
@@ -79,7 +73,7 @@ func (t *Turtle) System() *l.System {
 // Draw makes the turtle draw on the canvas based on the state in the system
 func (t *Turtle) Draw(cv *canvas.Canvas, w, h float64) {
 
-	unitPixel := 100.0
+	unitPixel := 50.0
 
 	// F: move forward one step with pen down
 	// G: Moves the turtle forward 1 step with the pen up, leaving no mark.

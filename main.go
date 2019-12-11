@@ -117,6 +117,14 @@ func lawninspring() (string, float64, l.Rules) {
 
 	return axiom, 16, rules
 }
+func fractalplant() (string, float64, l.Rules) {
+	axiom := "X"
+	rules := l.NewRules()
+	rules.Add('X', "F+[[X]-X]-F[-FX]+X")
+	rules.Add('F', "FF")
+
+	return axiom, 14.4, rules
+}
 func simple() (string, float64, l.Rules) {
 	axiom := "Y"
 	rules := l.NewRules()
@@ -131,27 +139,27 @@ func main() {
 
 	width, height := 1024, 768
 
-	axiom, angle, rules := bush()
+	axiom, angle, rules := fractalplant()
 	system := l.NewSystem(axiom, rules)
 
-	order := 4
+	order := 6
 	// turtle lives in 0,0 -> 1,1 space; top left is 0,0
-	xstart, ystart := 0.5, 0.9
+	xstart, ystart := 0.2, 1.0
 	initialState := turtle.State{
 		Position:  turtle.NewPoint(xstart, ystart),
 		Direction: 180, // up
-		StepSize:  0.2,
+		StepSize:  0.1,
 		BrushSize: 1,
 		Angle:     angle,
 	}
-	rotate := 0.0
+	rotate := -25.0
 	t := turtle.NewTurtle(system, initialState, rotate)
 
 	// Execute the steps
-	delay := 5 * time.Millisecond
+	delay := 0 * time.Millisecond
 	// TODO: Put in own thread and add locking as needed
 	go func() {
-		time.Sleep(1 * time.Second)
+		// time.Sleep(1 * time.Second)
 		t.Step(order, delay)
 	}()
 
