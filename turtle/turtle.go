@@ -1,13 +1,14 @@
 package turtle
 
 import (
+	"image/color"
 	"log"
 	"math"
+	"strconv"
 	"time"
 
 	"github.com/golang-collections/collections/stack"
-
-	"golang.org/x/image/colornames"
+	"github.com/lucasb-eyer/go-colorful"
 
 	"github.com/DanTulovsky/L-System/l"
 	"github.com/tfriedel6/canvas"
@@ -30,6 +31,7 @@ type State struct {
 	StepSize  float64
 	BrushSize float64
 	Angle     float64 // Sets the number of turns that make up a complete circle to n. (Each turn will be by 360°/n.)
+	color     int
 }
 
 // Turtle allows drawing on a canvas
@@ -37,17 +39,19 @@ type Turtle struct {
 	state      State
 	stateStack *stack.Stack
 	system     *l.System
+	palette    []colorful.Color
 }
 
 // NewTurtle returns a new turtle centered at pos
 // rotate controls rotation of the entire drawing by n°. Positive values rotate counterclockwise,
 // negative values rotate clockwise. With the default of 0, the turtle begins pointing up.
 // For example, to start with the turtle pointing to the right, use rotate 90.
-func NewTurtle(lsystem *l.System, state State, rotate float64) *Turtle {
+func NewTurtle(lsystem *l.System, state State, rotate float64, palette []colorful.Color) *Turtle {
 	t := &Turtle{
 		state:      state,
 		system:     lsystem,
 		stateStack: stack.New(),
+		palette:    palette,
 	}
 
 	t.state.Direction = math.Mod(t.state.Direction+rotate, 360)
@@ -70,6 +74,13 @@ func (t *Turtle) System() *l.System {
 	return t.system
 }
 
+// updateColor returns the color n steps after the current color and sets it in state
+func (t *Turtle) updateColor(n int) color.Color {
+	i := (t.state.color + n) % len(t.palette)
+	t.state.color = i
+	return t.palette[i]
+}
+
 // Draw makes the turtle draw on the canvas based on the state in the system
 func (t *Turtle) Draw(cv *canvas.Canvas, w, h float64) {
 
@@ -86,6 +97,7 @@ func (t *Turtle) Draw(cv *canvas.Canvas, w, h float64) {
 	// clear screen
 	cv.SetFillStyle("#000")
 	cv.FillRect(0, 0, w, h)
+	cv.SetStrokeStyle(t.palette[t.state.color])
 
 	lstate := t.state
 	// set turtle position based on screen size
@@ -97,8 +109,8 @@ func (t *Turtle) Draw(cv *canvas.Canvas, w, h float64) {
 
 		cv.BeginPath()
 		cv.MoveTo(lstate.Position.X, lstate.Position.Y)
-		switch i {
-		case "F":
+		switch {
+		case i == "F":
 			dirR := lstate.Direction * (math.Pi / 180)
 			x := lstate.Position.X + lstate.StepSize*unitPixel*math.Sin(dirR)
 			y := lstate.Position.Y + lstate.StepSize*unitPixel*math.Cos(dirR)
@@ -106,7 +118,7 @@ func (t *Turtle) Draw(cv *canvas.Canvas, w, h float64) {
 			cv.LineTo(x, y)
 			lstate.Position.X = x
 			lstate.Position.Y = y
-		case "G":
+		case i == "G":
 			dirR := lstate.Direction * (math.Pi / 180)
 			x := lstate.Position.X + lstate.StepSize*unitPixel*math.Sin(dirR)
 			y := lstate.Position.Y + lstate.StepSize*unitPixel*math.Cos(dirR)
@@ -115,23 +127,42 @@ func (t *Turtle) Draw(cv *canvas.Canvas, w, h float64) {
 			lstate.Position.X = x
 			lstate.Position.Y = y
 
-		case "-":
+		case i == "-":
 			lstate.Direction = lstate.Direction - 360/lstate.Angle
-		case "+":
+		case i == "+":
 			lstate.Direction = lstate.Direction + 360/lstate.Angle
-		case "@":
+		case i == "@":
 			lstate.StepSize = lstate.StepSize * 0.6
 			lstate.BrushSize = lstate.BrushSize * 0.6
-		case "[":
+		case i == "[":
 			// push state
 			t.stateStack.Push(lstate)
-		case "]":
+		case i == "]":
 			// pop state
 			lstate = (t.stateStack.Pop()).(State)
 			cv.MoveTo(lstate.Position.X, lstate.Position.Y)
+		case i[0] == '<':
+			n := 1
+			if len(i) > 1 {
+				var err error
+				n, err = strconv.Atoi(i[1:])
+				if err != nil {
+					panic(err)
+				}
+			}
+			cv.SetStrokeStyle(t.updateColor(n))
+		case i[0] == '>':
+			n := 1
+			if len(i) > 1 {
+				var err error
+				n, err = strconv.Atoi(i[1:])
+				if err != nil {
+					panic(err)
+				}
+			}
+			cv.SetStrokeStyle(t.updateColor(n))
 		}
 
-		cv.SetStrokeStyle(colornames.Red)
 		cv.SetLineWidth(lstate.BrushSize)
 		cv.Stroke()
 	}
