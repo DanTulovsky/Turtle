@@ -74,9 +74,16 @@ func (t *Turtle) System() *l.System {
 	return t.system
 }
 
-// updateColor returns the color n steps after the current color and sets it in state
-func (t *Turtle) updateColor(n int) color.Color {
+// shiftColor returns the color n steps after the current color and sets it in state
+func (t *Turtle) shiftColor(n int) color.Color {
 	i := (t.state.color + n) % len(t.palette)
+	t.state.color = i
+	return t.palette[i]
+}
+
+// setColor returns color n and sets it in state
+func (t *Turtle) setColor(n int) color.Color {
+	i := n % len(t.palette)
 	t.state.color = i
 	return t.palette[i]
 }
@@ -150,7 +157,7 @@ func (t *Turtle) Draw(cv *canvas.Canvas, w, h float64) {
 					panic(err)
 				}
 			}
-			cv.SetStrokeStyle(t.updateColor(n))
+			cv.SetStrokeStyle(t.shiftColor(n))
 		case i[0] == '>':
 			n := 1
 			if len(i) > 1 {
@@ -160,7 +167,17 @@ func (t *Turtle) Draw(cv *canvas.Canvas, w, h float64) {
 					panic(err)
 				}
 			}
-			cv.SetStrokeStyle(t.updateColor(n))
+			cv.SetStrokeStyle(t.shiftColor(n))
+		case i[0] == '%':
+			n := 0
+			if len(i) > 1 {
+				var err error
+				n, err = strconv.Atoi(i[1:])
+				if err != nil {
+					panic(err)
+				}
+			}
+			cv.SetStrokeStyle(t.setColor(n))
 		}
 
 		cv.SetLineWidth(lstate.BrushSize)

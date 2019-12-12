@@ -141,7 +141,7 @@ func main() {
 
 	width, height := 1024, 768
 
-	axiom, angle, rules := bush()
+	axiom, angle, rules := tree3()
 	lexer := l.NewDefaultLexer(rules)
 	system := l.NewSystem(axiom, rules, lexer)
 
