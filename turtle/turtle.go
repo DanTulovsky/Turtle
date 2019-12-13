@@ -57,15 +57,9 @@ func NewTurtle(lsystem *l.System, state State, rotate float64) *Turtle {
 // Step makes the turtle take n steps
 func (t *Turtle) Step(n int, delay time.Duration) {
 	log.Println("Calculating system...")
-	realdelay := delay
 
 	for i := 0; i < n; i++ {
-		if i == n-1 {
-			realdelay = delay
-		} else {
-			realdelay = 0
-		}
-		t.system.Step(realdelay)
+		t.system.Step(delay)
 
 	}
 	log.Println("Finished calculating system...")
@@ -79,7 +73,7 @@ func (t *Turtle) System() *l.System {
 // Draw makes the turtle draw on the canvas based on the state in the system
 func (t *Turtle) Draw(cv *canvas.Canvas, w, h float64) {
 
-	unitPixel := 100.0
+	unitPixel := 50.0
 
 	// F: move forward one step with pen down
 	// G: Moves the turtle forward 1 step with the pen up, leaving no mark.
@@ -98,14 +92,13 @@ func (t *Turtle) Draw(cv *canvas.Canvas, w, h float64) {
 	lstate.Position.X = lstate.Position.X * w
 	lstate.Position.Y = lstate.Position.Y * h
 
-	// for _, i := range t.system.State2() {
 	for e := t.System().State().Front(); e != nil; e = e.Next() {
-		i := e.Value.(rune)
+		i := e.Value.(string)
 
 		cv.BeginPath()
 		cv.MoveTo(lstate.Position.X, lstate.Position.Y)
 		switch i {
-		case 'F':
+		case "F":
 			dirR := lstate.Direction * (math.Pi / 180)
 			x := lstate.Position.X + lstate.StepSize*unitPixel*math.Sin(dirR)
 			y := lstate.Position.Y + lstate.StepSize*unitPixel*math.Cos(dirR)
@@ -113,7 +106,7 @@ func (t *Turtle) Draw(cv *canvas.Canvas, w, h float64) {
 			cv.LineTo(x, y)
 			lstate.Position.X = x
 			lstate.Position.Y = y
-		case 'G':
+		case "G":
 			dirR := lstate.Direction * (math.Pi / 180)
 			x := lstate.Position.X + lstate.StepSize*unitPixel*math.Sin(dirR)
 			y := lstate.Position.Y + lstate.StepSize*unitPixel*math.Cos(dirR)
@@ -122,17 +115,17 @@ func (t *Turtle) Draw(cv *canvas.Canvas, w, h float64) {
 			lstate.Position.X = x
 			lstate.Position.Y = y
 
-		case '-':
+		case "-":
 			lstate.Direction = lstate.Direction - 360/lstate.Angle
-		case '+':
+		case "+":
 			lstate.Direction = lstate.Direction + 360/lstate.Angle
-		case '@':
+		case "@":
 			lstate.StepSize = lstate.StepSize * 0.6
 			lstate.BrushSize = lstate.BrushSize * 0.6
-		case '[':
+		case "[":
 			// push state
 			t.stateStack.Push(lstate)
-		case ']':
+		case "]":
 			// pop state
 			lstate = (t.stateStack.Pop()).(State)
 			cv.MoveTo(lstate.Position.X, lstate.Position.Y)
