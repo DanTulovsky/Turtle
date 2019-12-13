@@ -219,7 +219,14 @@ func simple() (string, float64, l.Rules, int) {
 func custom1() (string, float64, l.Rules, int) {
 	axiom := "F"
 	rules := l.NewRules()
-	rules.Add("F", "@1.04F+F")
+	rules.Add("F", "F+F--")
+
+	return axiom, 8, rules, 4
+}
+func custom2() (string, float64, l.Rules, int) {
+	axiom := "F"
+	rules := l.NewRules()
+	rules.Add("F", "F|+FF")
 
 	return axiom, 8, rules, 4
 }
@@ -242,7 +249,7 @@ func main() {
 
 	width, height := 1024, 768
 
-	axiom, angle, rules, order := custom1()
+	axiom, angle, rules, order := custom2()
 	lexer := l.NewDefaultLexer(rules)
 	system := l.NewSystem(axiom, rules, lexer)
 
@@ -274,7 +281,7 @@ func main() {
 
 	// Display results
 	// delay in drawing each segment of each step
-	delay = 10 * time.Millisecond
+	delay = 0 * time.Millisecond
 	turtle.Run(t, width, height, delay)
 
 }

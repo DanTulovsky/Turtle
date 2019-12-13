@@ -76,6 +76,18 @@ func Run(t *Turtle, width, height int, delay time.Duration) {
 		backend.SetBounds(0, 0, ww, wh)
 	})
 
+	window.SetScrollCallback(func(w *glfw.Window, xoffset, yoffset float64) {
+		switch {
+		case yoffset > 0:
+			zoom = zoom + zoomfactor
+		case yoffset < 0:
+			if zoom < zoomfactor*2 {
+				zoomfactor = zoomfactor / 10
+			}
+			zoom = zoom - zoomfactor
+		}
+
+	})
 	window.SetKeyCallback(func(w *glfw.Window, key glfw.Key, scancode int, action glfw.Action, mods glfw.ModifierKey) {
 		switch action {
 		case glfw.Press, glfw.Repeat:
