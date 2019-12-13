@@ -27,7 +27,7 @@ var (
 )
 
 // Run runs the simulation with the given turtle
-func Run(t *Turtle, width, height int) {
+func Run(t *Turtle, width, height int, delay time.Duration) {
 
 	// init GLFW
 	err := glfw.Init()
@@ -87,7 +87,6 @@ func Run(t *Turtle, width, height int) {
 					zoomfactor = zoomfactor / 10
 				}
 				zoom = zoom - zoomfactor
-				log.Println(zoom)
 			case glfw.KeyLeft, glfw.KeyA:
 				xoffset = xoffset - 10
 			case glfw.KeyRight, glfw.KeyD:
@@ -97,8 +96,7 @@ func Run(t *Turtle, width, height int) {
 			case glfw.KeyDown, glfw.KeyS:
 				yoffset = yoffset + 10
 			case glfw.KeyN:
-				delay := 0 * time.Millisecond
-				t.System().Step(delay)
+				go t.System().Step(delay)
 			case glfw.KeyE:
 				t.State().Direction = t.State().Direction + t.State().Left*10
 			case glfw.KeyQ:

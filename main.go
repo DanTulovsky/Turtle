@@ -235,7 +235,7 @@ func main() {
 
 	width, height := 1024, 768
 
-	axiom, angle, rules, order := penrose()
+	axiom, angle, rules, order := kitesdarts()
 	lexer := l.NewDefaultLexer(rules)
 	system := l.NewSystem(axiom, rules, lexer)
 
@@ -266,6 +266,8 @@ func main() {
 	turtle.ShowDocs()
 
 	// Display results
-	turtle.Run(t, width, height)
+	// delay in drawing each segment of each step
+	delay = 10 * time.Millisecond
+	turtle.Run(t, width, height, delay)
 
 }
