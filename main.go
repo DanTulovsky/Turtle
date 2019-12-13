@@ -216,6 +216,13 @@ func simple() (string, float64, l.Rules, int) {
 	return axiom, 8, rules, 4
 }
 
+func custom1() (string, float64, l.Rules, int) {
+	axiom := "F"
+	rules := l.NewRules()
+	rules.Add("F", "@1.04F+F")
+
+	return axiom, 8, rules, 4
+}
 func defaultState(position turtle.Point, stepSize, angle float64) turtle.State {
 	return turtle.State{
 		Position:  position,
@@ -235,15 +242,15 @@ func main() {
 
 	width, height := 1024, 768
 
-	axiom, angle, rules, order := kitesdarts()
+	axiom, angle, rules, order := custom1()
 	lexer := l.NewDefaultLexer(rules)
 	system := l.NewSystem(axiom, rules, lexer)
 
 	// order override for testing
-	order = 1
+	order = 0
 
 	// turtle lives in 0,0 -> 1,1 space; top left is 0,0
-	position := turtle.NewPoint(0.5, 1.0)
+	position := turtle.NewPoint(0.5, 0.5)
 
 	palette := turtle.NewPalette()
 	initialState := defaultState(position, 1, angle)

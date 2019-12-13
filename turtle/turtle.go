@@ -205,7 +205,7 @@ func (t *Turtle) Draw(cv *canvas.Canvas, w, h float64, zoom float64, xoffset, yo
 			}
 
 			t.state.StepSize = t.state.StepSize * s
-			t.state.BrushSize = t.state.BrushSize * s
+			// t.state.BrushSize = t.state.BrushSize * s
 		case i == "[":
 			// push state
 			t.stateStack.Push(t.state)
