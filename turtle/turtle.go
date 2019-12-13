@@ -144,9 +144,38 @@ func (t *Turtle) Draw(cv *canvas.Canvas, w, h float64) {
 			t.state.Direction = t.state.Direction - 360/t.state.Angle
 		case i == "+":
 			t.state.Direction = t.state.Direction + 360/t.state.Angle
-		case i == "@":
-			t.state.StepSize = t.state.StepSize * 0.6
-			t.state.BrushSize = t.state.BrushSize * 0.6
+		case i[0] == '@':
+			s := 0.6
+			var err error
+
+			index := 1
+			reciprocal := false
+			squareroot := false
+
+			if len(i) > 1 {
+				switch i[1] {
+				case 'I':
+					index++
+					reciprocal = true
+				case 'Q':
+					index++
+					squareroot = true
+				}
+
+				s, err = strconv.ParseFloat(i[index:], 64)
+				if err != nil {
+					panic(err)
+				}
+			}
+			if reciprocal {
+				s = 1 / s
+			}
+			if squareroot {
+				s = math.Sqrt(s)
+			}
+
+			t.state.StepSize = t.state.StepSize * s
+			t.state.BrushSize = t.state.BrushSize * s
 		case i == "[":
 			// push state
 			t.stateStack.Push(t.state)

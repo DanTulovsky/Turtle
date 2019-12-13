@@ -139,25 +139,25 @@ func main() {
 
 	width, height := 1024, 768
 
-	axiom, angle, rules := tree3()
-	// axiom, angle, rules := bush()
+	// axiom, angle, rules := lawninspring()
+	axiom, angle, rules := tree1()
 	lexer := l.NewDefaultLexer(rules)
 	system := l.NewSystem(axiom, rules, lexer)
 
-	order := 7
+	order := 8
 	// turtle lives in 0,0 -> 1,1 space; top left is 0,0
-	xstart, ystart := 0.2, 1.0
+	xstart, ystart := 0.4, 0.9
 
 	palette := turtle.NewPalette()
 	initialState := turtle.State{
 		Position:  turtle.NewPoint(xstart, ystart),
 		Direction: 180, // up
-		StepSize:  0.1,
+		StepSize:  6,
 		BrushSize: 3,
 		Angle:     angle,
 		Color:     0,
 	}
-	rotate := 0.0
+	rotate := -90.0
 	t := turtle.NewTurtle(system, initialState, rotate, palette)
 
 	// Execute the steps
