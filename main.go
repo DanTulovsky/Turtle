@@ -28,6 +28,14 @@ func tree1() (string, float64, l.Rules, int) {
 
 	return axiom, 12, rules, 8
 }
+func tree2() (string, float64, l.Rules, int) {
+	axiom := "X"
+	rules := l.NewRules()
+	rules.Add("X", "F[>8+X][>8-X]FX")
+	rules.Add("F", "FF")
+
+	return axiom, 14, rules, 6
+}
 
 func tree3() (string, float64, l.Rules, int) {
 	axiom := "X"
@@ -207,6 +215,19 @@ func simple() (string, float64, l.Rules, int) {
 
 	return axiom, 8, rules, 4
 }
+
+func defaultState(position turtle.Point, stepSize, angle float64) turtle.State {
+	return turtle.State{
+		Position:  position,
+		Direction: 180, // up
+		StepSize:  stepSize,
+		BrushSize: 2,
+		Angle:     angle,
+		Color:     0,
+		Left:      -1.0,
+	}
+}
+
 func main() {
 	runtime.LockOSThread()
 	flag.Parse()
@@ -214,32 +235,37 @@ func main() {
 
 	width, height := 1024, 768
 
-	axiom, angle, rules, order := fractalplant()
+	axiom, angle, rules, order := penrose()
 	lexer := l.NewDefaultLexer(rules)
 	system := l.NewSystem(axiom, rules, lexer)
 
+	// order override for testing
+	order = 1
+
 	// turtle lives in 0,0 -> 1,1 space; top left is 0,0
-	xstart, ystart := 0.5, 1.0
+	position := turtle.NewPoint(0.5, 1.0)
 
 	palette := turtle.NewPalette()
-	initialState := turtle.State{
-		Position:  turtle.NewPoint(xstart, ystart),
-		Direction: 180, // up
-		StepSize:  0.1,
-		BrushSize: 2,
-		Angle:     angle,
-		Color:     0,
-		Left:      -1.0,
-	}
-	rotate := 0.0
+	initialState := defaultState(position, 1, angle)
+	rotate := 0.0 // rotate turtle by this many degrees initially
 	t := turtle.NewTurtle(system, initialState, rotate, palette)
 
-	// Execute the steps
+	// Execute the steps, keep track of min and max x,y coordinates for scaling
 	delay := 0 * time.Millisecond
-	go func() {
-		t.Step(order, delay)
-	}()
+	for i := 0; i < order; i++ {
+		t.System().Step(delay)
+	}
+
+	// run the last step in its own thread for possible animation
+	// func() {
+	// 	time.Sleep(1*time.Second)
+	// 	t.System().Step(delay)
+	// }()
+
+	// display some directions
+	turtle.ShowDocs()
 
 	// Display results
 	turtle.Run(t, width, height)
+
 }

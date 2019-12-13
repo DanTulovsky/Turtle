@@ -1,6 +1,7 @@
 package turtle
 
 import (
+	"fmt"
 	"image/color"
 	"log"
 	"math"
@@ -74,6 +75,11 @@ func (t *Turtle) System() *l.System {
 	return t.system
 }
 
+// State returns the pointer to the current state attached to the turtle
+func (t *Turtle) State() *State {
+	return &t.state
+}
+
 // shiftColor returns the color n steps after the current color and sets it in state
 func (t *Turtle) shiftColor(n int) color.Color {
 	i := (t.state.Color + n) % 256
@@ -95,10 +101,20 @@ func (t *Turtle) setColor(n int) color.Color {
 	return c
 }
 
-// Draw makes the turtle draw on the canvas based on the state in the system
-func (t *Turtle) Draw(cv *canvas.Canvas, w, h float64) {
+// ShowDocs prints out usage documentation
+func ShowDocs() {
+	fmt.Println()
+	fmt.Println("> Use the  '+' and '-' keys to zoom in and out.")
+	fmt.Println("> Use the arrow keys (or w,s,a,d) to move render around.")
+	fmt.Println("> Use 'n' to add another step.")
+	fmt.Println("> Use 'e' and 'q' to rotate right and left.")
+	fmt.Println()
+}
 
-	unitPixel := 50.0
+// Draw makes the turtle draw on the canvas based on the state in the system
+func (t *Turtle) Draw(cv *canvas.Canvas, w, h float64, zoom float64, xoffset, yoffset float64) {
+
+	unitPixel := 10.0 * zoom
 
 	// https://cgjennings.ca/articles/l-systems/
 	// F: move forward one step with pen down
@@ -118,8 +134,8 @@ func (t *Turtle) Draw(cv *canvas.Canvas, w, h float64) {
 	oldstate := t.state
 
 	// set turtle position based on screen size
-	t.state.Position.X = t.state.Position.X * w
-	t.state.Position.Y = t.state.Position.Y * h
+	t.state.Position.X = t.state.Position.X*w + xoffset
+	t.state.Position.Y = t.state.Position.Y*h + yoffset
 
 	for e := t.System().State().Front(); e != nil; e = e.Next() {
 		i := e.Value.(string)
