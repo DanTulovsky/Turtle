@@ -31,6 +31,7 @@ type State struct {
 	BrushSize float64
 	Angle     float64 // Sets the number of turns that make up a complete circle to n. (Each turn will be by 360°/n.)
 	Color     int
+	Left      float64 // 1 or -1
 }
 
 // Turtle allows drawing on a canvas
@@ -99,6 +100,7 @@ func (t *Turtle) Draw(cv *canvas.Canvas, w, h float64) {
 
 	unitPixel := 50.0
 
+	// https://cgjennings.ca/articles/l-systems/
 	// F: move forward one step with pen down
 	// G: Moves the turtle forward 1 step with the pen up, leaving no mark.
 	// -: turn right 45
@@ -112,7 +114,9 @@ func (t *Turtle) Draw(cv *canvas.Canvas, w, h float64) {
 	cv.FillRect(0, 0, w, h)
 	cv.SetStrokeStyle(t.setColor(0))
 
+	// save initial state for redraw
 	oldstate := t.state
+
 	// set turtle position based on screen size
 	t.state.Position.X = t.state.Position.X * w
 	t.state.Position.Y = t.state.Position.Y * h
@@ -122,6 +126,7 @@ func (t *Turtle) Draw(cv *canvas.Canvas, w, h float64) {
 
 		cv.BeginPath()
 		cv.MoveTo(t.state.Position.X, t.state.Position.Y)
+
 		switch {
 		case i == "F":
 			dirR := t.state.Direction * (math.Pi / 180)
@@ -141,9 +146,18 @@ func (t *Turtle) Draw(cv *canvas.Canvas, w, h float64) {
 			t.state.Position.Y = y
 
 		case i == "-":
-			t.state.Direction = t.state.Direction - 360/t.state.Angle
+			t.state.Direction = t.state.Direction + t.state.Left*(360/t.state.Angle)
 		case i == "+":
-			t.state.Direction = t.state.Direction + 360/t.state.Angle
+			t.state.Direction = t.state.Direction + (-t.state.Left)*(360/t.state.Angle)
+		case i == "!":
+			t.state.Left = -t.state.Left
+		case i == "|":
+			// Turns the turtle around (as close to 180° as the angle value allows).
+			turnby := 0.0
+			for turnby < 180 {
+				turnby = turnby + 360/t.state.Angle
+			}
+			t.state.Direction = math.Mod(t.state.Direction+turnby, 360)
 		case i[0] == '@':
 			s := 0.6
 			var err error
