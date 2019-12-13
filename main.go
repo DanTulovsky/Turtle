@@ -139,25 +139,29 @@ func main() {
 
 	width, height := 1024, 768
 
-	axiom, angle, rules := fractalplant()
-	system := l.NewSystem(axiom, rules)
+	axiom, angle, rules := tree3()
+	// axiom, angle, rules := bush()
+	lexer := l.NewDefaultLexer(rules)
+	system := l.NewSystem(axiom, rules, lexer)
 
-	order := 6
+	order := 7
 	// turtle lives in 0,0 -> 1,1 space; top left is 0,0
 	xstart, ystart := 0.2, 1.0
+
+	palette := turtle.NewPalette()
 	initialState := turtle.State{
 		Position:  turtle.NewPoint(xstart, ystart),
 		Direction: 180, // up
-		StepSize:  0.25,
-		BrushSize: 1,
+		StepSize:  0.1,
+		BrushSize: 3,
 		Angle:     angle,
+		Color:     0,
 	}
-	rotate := -25.0
-	t := turtle.NewTurtle(system, initialState, rotate)
+	rotate := 0.0
+	t := turtle.NewTurtle(system, initialState, rotate, palette)
 
 	// Execute the steps
 	delay := 0 * time.Millisecond
-	// TODO: Put in own thread and add locking as needed
 	go func() {
 		t.Step(order, delay)
 	}()

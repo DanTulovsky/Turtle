@@ -1,13 +1,13 @@
 package turtle
 
 import (
+	"image/color"
 	"log"
 	"math"
+	"strconv"
 	"time"
 
 	"github.com/golang-collections/collections/stack"
-
-	"golang.org/x/image/colornames"
 
 	"github.com/DanTulovsky/L-System/l"
 	"github.com/tfriedel6/canvas"
@@ -30,6 +30,7 @@ type State struct {
 	StepSize  float64
 	BrushSize float64
 	Angle     float64 // Sets the number of turns that make up a complete circle to n. (Each turn will be by 360°/n.)
+	Color     int
 }
 
 // Turtle allows drawing on a canvas
@@ -37,17 +38,19 @@ type Turtle struct {
 	state      State
 	stateStack *stack.Stack
 	system     *l.System
+	palette    GradientTable
 }
 
 // NewTurtle returns a new turtle centered at pos
 // rotate controls rotation of the entire drawing by n°. Positive values rotate counterclockwise,
 // negative values rotate clockwise. With the default of 0, the turtle begins pointing up.
 // For example, to start with the turtle pointing to the right, use rotate 90.
-func NewTurtle(lsystem *l.System, state State, rotate float64) *Turtle {
+func NewTurtle(lsystem *l.System, state State, rotate float64, palette GradientTable) *Turtle {
 	t := &Turtle{
 		state:      state,
 		system:     lsystem,
 		stateStack: stack.New(),
+		palette:    palette,
 	}
 
 	t.state.Direction = math.Mod(t.state.Direction+rotate, 360)
@@ -70,6 +73,27 @@ func (t *Turtle) System() *l.System {
 	return t.system
 }
 
+// shiftColor returns the color n steps after the current color and sets it in state
+func (t *Turtle) shiftColor(n int) color.Color {
+	i := (t.state.Color + n) % 256
+	t.state.Color = i
+	// log.Printf("n is: %v; i is: %v", n, i)
+
+	c := t.palette.GetInterpolatedColorFor(float64(i))
+	// log.Println(c)
+	return c
+}
+
+// setColor returns color n and sets it in state
+func (t *Turtle) setColor(n int) color.Color {
+	i := n % 255
+	t.state.Color = i
+
+	c := t.palette.GetInterpolatedColorFor(float64(i))
+	// log.Printf("setting: %v -> %v", i, c)
+	return c
+}
+
 // Draw makes the turtle draw on the canvas based on the state in the system
 func (t *Turtle) Draw(cv *canvas.Canvas, w, h float64) {
 
@@ -86,53 +110,88 @@ func (t *Turtle) Draw(cv *canvas.Canvas, w, h float64) {
 	// clear screen
 	cv.SetFillStyle("#000")
 	cv.FillRect(0, 0, w, h)
+	cv.SetStrokeStyle(t.setColor(0))
 
-	lstate := t.state
+	oldstate := t.state
 	// set turtle position based on screen size
-	lstate.Position.X = lstate.Position.X * w
-	lstate.Position.Y = lstate.Position.Y * h
+	t.state.Position.X = t.state.Position.X * w
+	t.state.Position.Y = t.state.Position.Y * h
 
 	for e := t.System().State().Front(); e != nil; e = e.Next() {
 		i := e.Value.(string)
 
 		cv.BeginPath()
-		cv.MoveTo(lstate.Position.X, lstate.Position.Y)
-		switch i {
-		case "F":
-			dirR := lstate.Direction * (math.Pi / 180)
-			x := lstate.Position.X + lstate.StepSize*unitPixel*math.Sin(dirR)
-			y := lstate.Position.Y + lstate.StepSize*unitPixel*math.Cos(dirR)
+		cv.MoveTo(t.state.Position.X, t.state.Position.Y)
+		switch {
+		case i == "F":
+			dirR := t.state.Direction * (math.Pi / 180)
+			x := t.state.Position.X + t.state.StepSize*unitPixel*math.Sin(dirR)
+			y := t.state.Position.Y + t.state.StepSize*unitPixel*math.Cos(dirR)
 
 			cv.LineTo(x, y)
-			lstate.Position.X = x
-			lstate.Position.Y = y
-		case "G":
-			dirR := lstate.Direction * (math.Pi / 180)
-			x := lstate.Position.X + lstate.StepSize*unitPixel*math.Sin(dirR)
-			y := lstate.Position.Y + lstate.StepSize*unitPixel*math.Cos(dirR)
+			t.state.Position.X = x
+			t.state.Position.Y = y
+		case i == "G":
+			dirR := t.state.Direction * (math.Pi / 180)
+			x := t.state.Position.X + t.state.StepSize*unitPixel*math.Sin(dirR)
+			y := t.state.Position.Y + t.state.StepSize*unitPixel*math.Cos(dirR)
 
 			cv.MoveTo(x, y)
-			lstate.Position.X = x
-			lstate.Position.Y = y
+			t.state.Position.X = x
+			t.state.Position.Y = y
 
-		case "-":
-			lstate.Direction = lstate.Direction - 360/lstate.Angle
-		case "+":
-			lstate.Direction = lstate.Direction + 360/lstate.Angle
-		case "@":
-			lstate.StepSize = lstate.StepSize * 0.6
-			lstate.BrushSize = lstate.BrushSize * 0.6
-		case "[":
+		case i == "-":
+			t.state.Direction = t.state.Direction - 360/t.state.Angle
+		case i == "+":
+			t.state.Direction = t.state.Direction + 360/t.state.Angle
+		case i == "@":
+			t.state.StepSize = t.state.StepSize * 0.6
+			t.state.BrushSize = t.state.BrushSize * 0.6
+		case i == "[":
 			// push state
-			t.stateStack.Push(lstate)
-		case "]":
+			t.stateStack.Push(t.state)
+		case i == "]":
 			// pop state
-			lstate = (t.stateStack.Pop()).(State)
-			cv.MoveTo(lstate.Position.X, lstate.Position.Y)
+			t.state = (t.stateStack.Pop()).(State)
+
+			c := t.palette.GetInterpolatedColorFor(float64(t.state.Color))
+			cv.SetStrokeStyle(c)
+			cv.MoveTo(t.state.Position.X, t.state.Position.Y)
+		case i[0] == '<':
+			n := 1
+			if len(i) > 1 {
+				var err error
+				n, err = strconv.Atoi(i[1:])
+				if err != nil {
+					panic(err)
+				}
+			}
+			cv.SetStrokeStyle(t.shiftColor(-n))
+		case i[0] == '>':
+			n := 1
+			if len(i) > 1 {
+				var err error
+				n, err = strconv.Atoi(i[1:])
+				if err != nil {
+					panic(err)
+				}
+			}
+			cv.SetStrokeStyle(t.shiftColor(n))
+		case i[0] == '%':
+			n := 0
+			if len(i) > 1 {
+				var err error
+				n, err = strconv.Atoi(i[1:])
+				if err != nil {
+					panic(err)
+				}
+			}
+			cv.SetStrokeStyle(t.setColor(n))
 		}
 
-		cv.SetStrokeStyle(colornames.Red)
-		cv.SetLineWidth(lstate.BrushSize)
+		cv.SetLineWidth(t.state.BrushSize)
 		cv.Stroke()
 	}
+
+	t.state = oldstate
 }
