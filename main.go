@@ -8,6 +8,9 @@ import (
 
 	"github.com/DanTulovsky/L-System/l"
 	"github.com/DanTulovsky/Turtle/turtle"
+
+	"net/http"
+	_ "net/http/pprof"
 )
 
 func dragonCurve() (string, float64, l.Rules, int) {
@@ -242,10 +245,20 @@ func defaultState(position turtle.Point, stepSize, angle float64) turtle.State {
 	}
 }
 
-func main() {
+func init() {
+	// This is needed to arrange that main() runs on main thread.
+	// See documentation for functions that are only allowed to be called from the main thread.
 	runtime.LockOSThread()
+}
+
+func main() {
 	flag.Parse()
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
+
+	go func() {
+		// https://golang.org/pkg/net/http/pprof/
+		log.Println(http.ListenAndServe("localhost:6060", nil))
+	}()
 
 	width, height := 1024, 768
 
